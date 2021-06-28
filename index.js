@@ -222,14 +222,15 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
   if (trackState == "rewarded") {
     trackLink = "";
   }
-  const isNew = compareVersion(app.sdkv, "1.2.15");
-  if(isWebView ||  bundle == 'com.orange.media3'){
+  const isNewOrange = compareVersion(app.sdkv, "1.5.2");
+  if(isWebView ||  (bundle == 'com.orange.media3' && isNewOrange != -1 && isSelfHost)){
     window.AdSDK.WebView.loadURL(jumpPage,555,666)
     setTimeout(()=>{
       window.AdSDK.WebView.show(666)
     },500)
     return;
   }
+  const isNew = compareVersion(app.sdkv, "1.2.15");
   if (isNew != -1 && trackLink && trackState != "rewarded") {
     //是否是新的sdk版本   是   并行
     window.AdSDK.openBrowser(jumpPage, {
@@ -239,4 +240,11 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
   } else {
     window.AdSDK.openBrowser(trackLink ? trackLink : jumpPage);
   }
+}
+
+
+export const isIOS = () => {
+  let u = navigator.userAgent,
+    isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+  return !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
 }
