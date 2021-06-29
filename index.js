@@ -207,8 +207,18 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
   const time = new Date().getTime();
   let isGp = landPage.indexOf("play.google.com") != -1;
   let isSelfHost =landPage.indexOf("dl.abea3.xyz") != -1  //是否是自己内部的落地页
+  const isNewOrange = compareVersion(app.sdkv, "1.5.2");
+  if(bundle == 'com.orange.media3' && isNewOrange != -1 && isSelfHost){
+    isWebView = true
+  }
+  var aLandPageParam = landPage.split("?");
+  landPage = aLandPageParam[0]
+  var landPageParam = ""
+  if(aLandPageParam.length>1){
+     landPageParam = "&"+aLandPageParam[1]
+  }
   isWebView = isWebView ||  ""
-  const params = `?isWebView=${isWebView}opentype=${pageTitle}&did=${did}&source=${source}&bundle=${bundle}&ts=${time}&sourceType=${sourceType}`
+  const params = `?isWebView=${isWebView}&opentype=${pageTitle}&did=${did}&source=${source}&bundle=${bundle}&ts=${time}&sourceType=${sourceType}${landPageParam}`
   let url = `${landPage}${params}`;
   let jumpPage = (isGp || !isSelfHost) ? landPage : `${jumpUrl}?dataPageTitle=${pageTitle}&dataElementName=${elementName}&dataRemarks=${source}&url=${encodeURIComponent( url )}&bundle=${bundle}&did=${did}&mpid=${pos.mpid}&pos=${pos.id}&crid=${ pos.crid }&cpid=${pos.cpid}`;
   if (flag && track) {
@@ -222,7 +232,7 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
   if (trackState == "rewarded") {
     trackLink = "";
   }
-  const isNewOrange = compareVersion(app.sdkv, "1.5.2");
+  
   if(isWebView ||  (bundle == 'com.orange.media3' && isNewOrange != -1 && isSelfHost)){
     window.AdSDK.WebView.loadURL(jumpPage,555,666)
     setTimeout(()=>{
@@ -241,6 +251,7 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
     window.AdSDK.openBrowser(trackLink ? trackLink : jumpPage);
   }
 }
+
 
 
 export const isIOS = () => {
