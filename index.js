@@ -146,7 +146,12 @@ export const compareVersion = (v1, v2) => {
     }
   }
 
-
+/**
+ * todo:积分墙方法要重写
+ * @param {*} source 
+ * @param {*} track 
+ * @param {*} pageTitle 
+ */
 export const jumpOfferWall = (source,track,pageTitle)=>{
   let {app} = sessionStorage;
   app = app ? JSON.parse(app) : {};
@@ -211,12 +216,15 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
   if(bundle == 'com.orange.media3' && isNewOrange != -1 && isSelfHost){
     isWebView = true
   }
-  var aLandPageParam = landPage.split("?");
-  landPage = aLandPageParam[0]
   var landPageParam = ""
-  if(aLandPageParam.length>1){
-     landPageParam = "&"+aLandPageParam[1]
+  if(!(isGp || !isSelfHost)){
+    var aLandPageParam = landPage.split("?");
+    landPage = aLandPageParam[0]
+    if(aLandPageParam.length>1){
+      landPageParam = "&"+aLandPageParam[1]
+    }
   }
+  
   isWebView = isWebView ||  ""
   const params = `?isWebView=${isWebView}&opentype=${pageTitle}&did=${did}&source=${source}&bundle=${bundle}&ts=${time}&sourceType=${sourceType}${landPageParam}`
   let url = `${landPage}${params}`;
@@ -259,3 +267,7 @@ export const isIOS = () => {
     isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
   return !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
 }
+
+/**
+ * todo:关闭方法
+ */
