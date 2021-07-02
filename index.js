@@ -1,6 +1,6 @@
 
-import Track from '@/utils/track'
-import store from '@/vuex/store'
+// import Track from '@/utils/track'
+// import store from '@/vuex/store'
 
 /**
  * @description 获取hash分流a/b策略
@@ -118,6 +118,7 @@ export const throttle = (fn,wait) =>{
         }
     }
 }
+
 /**
  * @description 两个版本号判断
  * @param {*} v1 
@@ -148,16 +149,17 @@ export const compareVersion = (v1, v2) => {
 
 /**
  * todo:积分墙方法要重写
- * @param {*} source 
- * @param {*} track 
- * @param {*} pageTitle 
+ * @param {String} source 
+ * @param {Object} track 
+ * @param {String} pageTitle 
+ * @param {Function} fn
  */
-export const jumpOfferWall = (source,track,pageTitle)=>{
+export const jumpOfferWall = (source,track,pageTitle,fn)=>{
   let {app} = sessionStorage;
   app = app ? JSON.parse(app) : {};
   const bundle = app.bundle;
-    const result = compareVersion(app.sdkv,"1.4.4")
-    if(result == -1 || bundle !="com.push.surprise" && !window.AdSDK.OfferWall.isReady()){
+  const result = compareVersion(app.sdkv,"1.4.4")
+  if(result == -1 || bundle !="com.push.surprise" && !window.AdSDK.OfferWall.isReady()){
       if(track)
       track.trackEvent({
         ev: "OfferWall",
@@ -165,11 +167,13 @@ export const jumpOfferWall = (source,track,pageTitle)=>{
         elementName:"",
         pageTitle: pageTitle,
       })
-      store.commit('setIntegralWallSource', source)
-      store.commit('setIsShowIntgralWall', true)
-    }else{
+    
+  }else{
       window.AdSDK.OfferWall.showAd(source)
-    } 
+  } 
+  if(typeof fn == 'function'){
+    fn()
+  }
 }
 
 /**
@@ -269,5 +273,30 @@ export const isIOS = () => {
 }
 
 /**
- * todo:关闭方法
+ * 关闭或者后退
+ * @returns 
  */
+ export const close = ()=> {
+  const level =  getUrlParams("level")
+  if(level){
+    window.history.go(-1)
+    return;
+  }
+  window.AdSDK.WebView.close(1)
+  window.AdSDK.close()
+}
+
+
+/**
+ * 跳转endcard
+ * @param {Number}} ecid endCardId  
+ * todo:是否把id换成name
+ */
+ export const location = (ecid,{...params})=> {
+  var sparams = ""
+  Object.keys(params).forEach(key=>{
+    sparams+=("&"+key+"="+params[key])
+  })
+  const { origin } =  window.location 
+  window.location.href = origin+"/ec/"+ecid+"?level=1"+sparams
+}
